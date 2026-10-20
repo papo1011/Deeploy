@@ -18,18 +18,41 @@ class iLeakyReLUParser(NodeParser):
         super().__init__()
 
     def parseNode(self, node: gs.Node) -> bool:
-        # TODO(student): return False if the node doesn't have exactly
         # one input, exactly one output, and both 'mul' and 'shift'
         # attributes. On success, store them into
         # self.operatorRepresentation as ints and return True.
-        return False
+        
+        # one input, exactly one output
+        if len(node.inputs) != 1 or len(node.outputs) != 1:
+            return False
+        # check if there are mul and shift
+        ret = all(['mul' in node.attrs, 'shift' in node.attrs])
+
+        # store them as int
+        if ret:
+            mul = int(node.attrs['mul'])
+            shift = int(node.attrs['shift'])
+            
+            if mul != 1 or not 0 <= shift < 8:
+                return False
+                    
+            self.operatorRepresentation['mul'] = mul
+            self.operatorRepresentation['shift'] = shift
+
+        return ret
 
     def parseNodeCtxt(self, ctxt: NetworkContext, node: gs.Node, channels_first: bool = True):
-        # TODO(student): look up the input and output tensors from ctxt
         # using node.inputs[0].name / node.outputs[0].name, and populate
         # self.operatorRepresentation with:
         #     'data_in'  -> input tensor name
         #     'data_out' -> output tensor name
         #     'size'     -> int(np.prod(input_shape))
         # Return (ctxt, True).
-        return ctxt, False
+        
+        data_in = ctxt.lookup(node.inputs[0].name)
+        data_out = ctxt.lookup(node.outputs[0].name)
+        self.operatorRepresentation['data_in'] = data_in.name
+        self.operatorRepresentation['data_out'] = data_out.name
+        self.operatorRepresentation['size'] = int(np.prod(data_in.shape))
+        
+        return ctxt, True

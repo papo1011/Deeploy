@@ -25,11 +25,19 @@ class iLeakyReLUTileConstraint(UnaryTileConstraint):
     def addGeometricalConstraint(tilerModel: TilerModel, parseDict: Dict, ctxt: NetworkContext) -> TilerModel:
         tilerModel = UnaryTileConstraint.addGeometricalConstraint(tilerModel, parseDict, ctxt)
 
-        # TODO(student, Step 6a): add a performance constraint so the
         # innermost tile dim is a multiple of 16. Helpful API:
         #     tilerModel.addTileSizeDivisibleConstraint(parseDict, name,
         #                                               tensorDimVar, modulo)
         # See: Deeploy/Targets/PULPOpen/TileConstraints/GEMMTileConstraint.py
         # for a usage example.
+
+        inputShape = ctxt.lookup(parseDict['data_in']).shape
+        lastDim = len(inputShape) - 1
+        lastDimVar = tilerModel.getTensorDimVar(tensorName = parseDict['data_in'], dimIdx = lastDim)
+        if inputShape[lastDim] >= 16:
+            dimKey = f'dim_{lastDim}'
+            parseDict[dimKey] = int(inputShape[lastDim])
+            tilerModel.addTileSizeDivisibleConstraint(parseDict, dimKey, lastDimVar, 16)
+
 
         return tilerModel

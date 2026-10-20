@@ -47,6 +47,8 @@ from Deeploy.Targets.PULPOpen.TileConstraints.SoftmaxCrossEntropyTileConstraint 
     SoftmaxCrossEntropyGradTileConstraint, SoftmaxCrossEntropyTileConstraint
 from Deeploy.Targets.PULPOpen.TileConstraints.StemConvTileConstraint import RQStemConv2DTileConstraint
 from Deeploy.TilingExtension.TilerExtension import TilingReadyNodeBindings
+from Deeploy.Targets.PULPOpen.TileConstraints.iLeakyReLUTileConstraint import iLeakyReLUTileConstraint
+from Deeploy.Targets.PULPOpen.Bindings import PULPiLeakyReLUBindings
 
 PULPRQSConv1DTilingReadyBindings = TilingReadyNodeBindings(nodeBindings = PULPRQSConv1DBindings,
                                                            tileConstraint = RQConv1DTileConstraint())
@@ -169,3 +171,6 @@ PULPSliceTilingReadyBindings = TilingReadyNodeBindings(nodeBindings = PULPSliceB
 
 PULPReduceMeanTilingReadyBindings = TilingReadyNodeBindings(nodeBindings = PULPReduceMeanBindings,
                                                             tileConstraint = ReduceMeanTileConstraint())
+
+PULPiLeakyReLUTilingReadyBindings = TilingReadyNodeBindings(nodeBindings = PULPiLeakyReLUBindings,
+                                                            tileConstraint = iLeakyReLUTileConstraint())

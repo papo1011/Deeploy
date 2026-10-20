@@ -29,8 +29,8 @@ void PULPiLeakyReLU_i8_i8(int8_t *pIn, int8_t *pOut, uint32_t size, int32_t mul,
   uint32_t end = (start + per > size) ? size : (start + per);
 
   for (uint32_t i = start; i < end; i++) {
-    // TODO(student): compute pOut[i] from pIn[i], mul, shift.
-    // Replace the following line:
-    pOut[i] = 0;
+    int32_t x  = (int32_t)pIn[i];
+    int32_t lo = (mul * x) >> shift;
+    pOut[i]    = (int8_t)((x >= 0) ? x : lo);
   }
 }

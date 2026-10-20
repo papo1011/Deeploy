@@ -47,10 +47,8 @@ void PULPiLeakyReLU_i8_i8(int8_t *pIn, int8_t *pOut, uint32_t size, int32_t mul,
 
   for (uint32_t i = vStart; i < vEnd; i++) {
     v4s x = vIn[i];
-    // TODO(student): one line to compute `s` from `x` and `shift`,
-    //                one line to blend `x` and `s` with the packed
-    //                signed max intrinsic and store it.
-    vOut[i] = x; // <- placeholder, replace
+    v4s s = x >> shift;                       // packed per-lane arith shift
+    vOut[i] = (v4s)__builtin_pulp_max4(x, s); // max(x, x>>shift) = LeakyReLU
   }
 
   // The trailing size % 4 elements never fill a vector; one core handles

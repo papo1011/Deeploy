@@ -17,7 +17,6 @@ class _iLeakyReLUTemplate(NodeTemplate):
         super().__init__(templateStr)
 
 
-# TODO(student): fill in the Mako template body so it emits a single
 # call to your C kernel:
 #
 #     PULPiLeakyReLU_i8_i8(<data_in>, <data_out>, <size>, <mul>, <shift>);
@@ -26,5 +25,5 @@ class _iLeakyReLUTemplate(NodeTemplate):
 # the parser (or that Deeploy fills automatically for tensor names).
 referenceTemplate = _iLeakyReLUTemplate("""
 // iLeakyReLU (Name: ${nodeName}, Op: ${nodeOp})
-// TODO(student): emit the kernel call here.
+PULPiLeakyReLU_i8_i8(${data_in}, ${data_out}, ${size}, ${mul}, ${shift});
 """)

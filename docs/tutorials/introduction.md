@@ -174,7 +174,7 @@ You can visualize the ONNX graphs using [Netron](https://netron.app/). Either us
 
 > ✅ **Task:** Visualize the ONNX graph of the `Tests/Kernels/Integer/Add/Regular`, `Tests/Models/MobileNetv2`, and `Tests/Models/Transformer`
 
-The ONNX graphs are in `DeeployTest/Tests/<TestName>/network.onnx`. The networks are increasing in complexity, `Tests/Kernels/Integer/Add/Regular` is a single node network for unit testing, while `Tests/Models/MobileNetv2` is a simple sequential network mostly made of convolutions. Finally, the `Tests/Models/Transformer` network showcases a typical transformer block used in Encoder and Decoder networks. If you want to peek at a complex network, you can visualize `Tests/Models/microLlama/microLlama128`.
+The ONNX graphs are in `DeeployTest/Tests/<TestName>/network.onnx`. The networks are increasing in complexity, `Tests/Kernels/Integer/Add/Regular` is a single node network for unit testing, while `Tests/Models/MobileNetv2` is a simple sequential network mostly made of convolutions. Finally, the `Tests/Models/Transformer` network showcases a typical transformer block used in Encoder and Decoder networks. If you want to peek at a complex network, you can visualize `Tests/Models/microLlama/INT8/microLlama128`.
 
 Now that we understand Deeploy's input, let's check the output-generated code!
 
@@ -245,7 +245,7 @@ Now that you understand the hardware and the kind of workload we want to execute
 <details>
  <summary><span style="font-weight: bold; font-size: 1.3em;">Solution</span></summary>
 
- > If you run `python deeployRunner_siracusa.py -t Tests/Models/microLlama/microLlama128 --cores=1` and then `python deeployRunner_siracusa.py -t Tests/Models/microLlama/microLlama128 --cores=8`, you should measure a runtime of ~16,1M cycles for 1 core and 3.1M cycles for 8 cores.
+ > If you run `python deeployRunner_siracusa.py -t Tests/Models/microLlama/INT8/microLlama128 --cores=1` and then `python deeployRunner_siracusa.py -t Tests/Models/microLlama/INT8/microLlama128 --cores=8`, you should measure a runtime of ~16,1M cycles for 1 core and 3.1M cycles for 8 cores.
  >
  > The speedup ratio is obtained via $\frac{\text{Runtime 1 cores}}{\text{Runtime 8 cores}} = 5.2$. Hence, using 8 cores instead of 1 leads to a 5.2 times speedup.
  >
@@ -267,9 +267,9 @@ The good news is that Deeploy can already do that! So, let's generate and run so
 <details>
  <summary><span style="font-weight: bold; font-size: 1.3em;">Solution</span></summary>
 
- > Bad configuration: `python deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/microLlama64_parallel --cores=8 --l1 8000 --defaultMemLevel=L2` -> Runtime: 47.5 MCycles
+ > Bad configuration: `python deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/INT8/microLlama64_parallel --cores=8 --l1 8000 --defaultMemLevel=L2` -> Runtime: 47.5 MCycles
  >
- > Good configuration `python deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2`: -> Runtime: 35.3 MCycles
+ > Good configuration `python deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/INT8/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2`: -> Runtime: 35.3 MCycles
  >
  > Justification: As the size of the L1 memory gets smaller, tiles also get smaller and smaller. Smaller tiles usually mean that it's harder to keep the core properly utilized.
 
@@ -290,7 +290,7 @@ With this profiling trace, you can clearly measure the overhead of DMA transfers
 
 > ⚠️ **Known bug (as of this writing).** `--profileTiling` currently crashes GVSOC on
 > the larger microLlama graphs. On
-> `deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2 --profileTiling`
+> `python deeployRunner_tiled_siracusa.py -t Tests/Models/microLlama/INT8/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2 --profileTiling`
 > the simulator aborts with
 > `Invalid access (pc: 0x1c00b944, offset: 0x57575757, size: 0x1, is_write: 0)`,
 > while the exact same command *without* `--profileTiling` passes cleanly
@@ -315,7 +315,7 @@ To use the NPU, you can use the `deeployRunner_tiled_siracusa_w_neureka.py`. The
  > The runtime in parallel mode with NPU is obtained with:
  >
  >`
- python deeployRunner_tiled_siracusa_w_neureka.py -t Tests/Models/microLlama/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2
+ python deeployRunner_tiled_siracusa_w_neureka.py -t Tests/Models/microLlama/INT8/microLlama64_parallel --cores=8 --l1 64000 --defaultMemLevel=L2
  `
  >
  > And returns 28.6 MCycles of runtime. The runtime without NPU was measured above and is 35.3 MCycles. Hence, the speedup is ~1.23 times.
